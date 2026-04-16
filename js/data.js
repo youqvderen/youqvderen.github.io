@@ -3,25 +3,23 @@ const quizConfig = {
     subtitle: "测测你是哪种健身狠人？",
     icon: "💪",
     
+    // 高训练水平人格列表（用于NPCS排除）
+    highTrainingTypes: ['POWER', 'OLDD', 'PAPA', 'WORR', 'SOLO'],
+    
     dimensions: {
-        // 社交维度
         S: { name: '社恐独狼', color: '#6366f1', desc: '专注训练，拒绝无效社交' },
         O: { name: '社交蝴蝶', color: '#f59e0b', desc: '健身是社交，器械是道具' },
-        
-        // 训练态度维度
         G: { name: '硬核狠人', color: '#10b981', desc: '追求数据，突破极限' },
         C: { name: '佛系养生', color: '#ec4899', desc: '动起来就行，不卷不焦虑' },
-        
-        // 外在表现维度
         A: { name: '表现型', color: '#e17055', desc: '训练5分钟，拍照2小时' },
         I: { name: '内敛型', color: '#8b5cf6', desc: '默默变强，惊艳所有人' },
-        
-        // 知识维度
         E: { name: '理论派', color: '#3b82f6', desc: '动作标准，知识系统' },
         W: { name: '野路子', color: '#f97316', desc: '干就完了，实践出真知' }
     },
 
+    // 20道题目（含4道训练水平专项题）
     questions: [
+        // 原有题目1-16...
         {
             text: "你走进健身房的第一件事是？",
             options: [
@@ -134,7 +132,7 @@ const quizConfig = {
             text: "你如何看待其他训练方法？",
             options: [
                 { text: "存在即合理，适合自己的最好", scores: { E: 2, C: 2, I: 1 } },
-                { text: " CrossFit/瑜伽/普拉提都是花架子，不如撸铁", scores: { W: 2, G: 1, O: 0 } },
+                { text: "CrossFit/瑜伽/普拉提都是花架子，不如撸铁", scores: { W: 2, G: 1, O: 0 } },
                 { text: "喜欢研究各种流派，批判性地吸收", scores: { E: 3, W: 1, A: 0 } },
                 { text: "我的方法最科学，其他的都是弯路", scores: { W: 3, E: 0, O: 1 } }
             ]
@@ -165,109 +163,321 @@ const quizConfig = {
                 { text: "背，倒三角是终极目标", scores: { G: 2, E: 1, I: 1 } },
                 { text: "核心/凯格尔，内在强大才是真的强", scores: { W: 2, I: 2, E: 0 } }
             ]
+        },
+        // 新增4道训练水平专项题（17-20）
+        {
+            text: "你的三大项总和（深蹲+卧推+硬拉）接近？",
+            options: [
+                { text: "还没测过/不到200kg", scores: { W: 2, C: 2, G: 0 }, trainingLevel: 1 },
+                { text: "200-400kg，还在进步", scores: { G: 2, E: 1, W: 1 }, trainingLevel: 2 },
+                { text: "400-600kg，健身房里算强的", scores: { G: 3, E: 2, I: 1 }, trainingLevel: 3 },
+                { text: "600kg+，人称小力王", scores: { G: 3, E: 2, S: 1 }, trainingLevel: 4 }
+            ]
+        },
+        {
+            text: "有人指出你的动作不标准，你会？",
+            options: [
+                { text: "感谢提醒，认真请教哪里不对", scores: { E: 3, C: 1, G: 1 }, trainingLevel: 3 },
+                { text: "表面接受，心里不服，继续按自己的来", scores: { W: 3, O: 1, A: 1 }, trainingLevel: 1 },
+                { text: "立刻查证，看权威资料验证", scores: { E: 3, G: 2, I: 1 }, trainingLevel: 4 },
+                { text: "关你屁事，我又没受伤", scores: { W: 3, C: 0, O: 0 }, trainingLevel: 1 }
+            ]
+        },
+        {
+            text: "你目前的训练年限？",
+            options: [
+                { text: "刚开始，不到半年", scores: { C: 2, W: 2, G: 0 }, trainingLevel: 1 },
+                { text: "半年到两年，找到感觉了", scores: { G: 2, E: 1, W: 1 }, trainingLevel: 2 },
+                { text: "两到五年，算是老手了", scores: { G: 3, E: 2, S: 1 }, trainingLevel: 3 },
+                { text: "五年以上，铁馆活化石", scores: { G: 3, E: 3, S: 2 }, trainingLevel: 4 }
+            ]
+        },
+        {
+            text: "关于训练计划，你的态度是？",
+            options: [
+                { text: "什么计划？来了随便练", scores: { W: 3, C: 2, G: 0 }, trainingLevel: 1 },
+                { text: "网上找的，跟着大神练", scores: { E: 2, W: 1, G: 1 }, trainingLevel: 2 },
+                { text: "自己根据情况调整，有周期规划", scores: { E: 3, G: 3, I: 1 }, trainingLevel: 3 },
+                { text: "科学周期化训练，数据追踪，定期测试PR", scores: { E: 3, G: 3, S: 1 }, trainingLevel: 4 }
+            ]
         }
     ],
 
     results: {
+        // 原有16个人格...
         'SOLO': {
             title: '独行侠',
+            titleEn: 'SOLO',
             icon: '🐺',
-            desc: '你是健身房的幽灵。耳机一戴，谁都不爱；练完就走，绝不纠缠。你拥有最高的训练效率，最短的在场时间，最专注的精神状态。社交？那是有氧区的事。',
-            tags: ['高效', '专注', '社恐', '耳机依赖症']
+            image: 'images/solo.png',
+            desc: '你是健身房的幽灵。耳机一戴，谁都不爱；练完就走，绝不纠缠。你拥有最高的训练效率，最短的在场时间，最专注的精神状态。',
+            slogan: '孤独是强者的通行证',
+            tags: ['高效', '专注', '社恐', '耳机依赖症'],
+            gymRelations: {
+                partner: 'OLDD（老登，能学到真东西）',
+                enemy: 'ACTO（影帝，占着器械拍照）',
+                attract: 'NPCS（群演，想变强但不知道怎么开始）'
+            },
+            alternatives: ['OLDD', 'WORR', 'POWER']
         },
         'ACTO': {
             title: '影帝',
+            titleEn: 'ACTOR',
             icon: '📸',
+            image: 'images/actor.png',
             desc: '你精通45度角显大，掌握黄金分割构图，深谙光影与饱和度的奥秘。训练5分钟，修图2小时。你的朋友圈没有废片，只有还没P好的杰作。',
-            tags: ['修图大师', '光影魔术师', '充血即巅峰', '朋友圈冠军']
+            slogan: '灯光是我的氮泵，滤镜是我的蛋白粉',
+            tags: ['修图大师', '光影魔术师', '充血即巅峰', '朋友圈冠军'],
+            gymRelations: {
+                partner: 'LOVE（恋爱脑，互相欣赏颜值）',
+                enemy: 'SOLO（独行侠，嫌你占器械）',
+                attract: 'VANI（消失者，只活在朋友圈）'
+            },
+            alternatives: ['LOVE', 'A', 'EATA']
         },
         'WORR': {
             title: '焦虑者',
+            titleEn: 'WORRIOR',
             icon: '😰',
+            image: 'images/worrior.png',
             desc: '臂围40+？还是太细。体脂12%？还是太肥。卧推100kg？还是太轻。你不断突破里程碑，却永远觉得自己是细狗。焦虑是你的氮泵，不满足是你的 progressive overload。',
-            tags: ['永远太细', '维度焦虑', '自我PUA', '镜子恐惧']
+            slogan: '永远太细，永远热泪盈眶',
+            tags: ['永远太细', '维度焦虑', '自我PUA', '镜子恐惧'],
+            gymRelations: {
+                partner: 'PAPA（教皇，能给你系统指导）',
+                enemy: 'ACTO（影帝，没训练痕迹还自信）',
+                attract: 'NPCS（群演，觉得你很强）'
+            },
+            alternatives: ['SOLO', 'POWER', 'OLDD']
         },
         'OLDD': {
             title: '老登',
+            titleEn: 'OLD DENG',
             icon: '🏋️',
+            image: 'images/olddeng.png',
             desc: '你的训练年限是别人的年龄，你的力量水平是新手的天花板。你自带生人勿近的铁锈味，但面对真诚请教的新手，你会露出罕见的微笑，倾囊相授。你是健身房的活化石，也是真正的扫地僧。',
-            tags: ['铁锈味', '力量断层', '外冷内热', '新手之友']
+            slogan: '铁锈味是岁月的勋章',
+            tags: ['铁锈味', '力量断层', '外冷内热', '新手之友'],
+            gymRelations: {
+                partner: 'SOLO（独行侠，不打扰你训练）',
+                enemy: 'NAXI（动作发明家，花里胡哨）',
+                attract: 'WORR（焦虑者，想变得和你一样强）'
+            },
+            alternatives: ['POWER', 'PAPA', 'SOLO']
         },
         'VANI': {
             title: '消失者',
+            titleEn: 'VANISHER',
             icon: '👻',
+            image: 'images/vanisher.png',
             desc: '办卡那天是你和健身房的第一次相遇，也是最后一次。你的卡是健身房的纯利润，你的存在是前台小姐的传说。也许某天你会回来，也许不会，但那不重要——你已经为健身事业做出了经济贡献。',
-            tags: ['一次性投资', '传说人物', '纯利润', '薛定谔的会员']
+            slogan: '薛定谔的会员，永远的传说',
+            tags: ['一次性投资', '传说人物', '纯利润', '薛定谔的会员'],
+            gymRelations: {
+                partner: '无（你不在健身房）',
+                enemy: '无（你不在健身房）',
+                attract: 'ACTO（影帝，只活在彼此的朋友圈里）'
+            },
+            alternatives: ['HUMOR', 'AUDI', 'NPCS']
         },
         'NPCS': {
             title: '群演',
+            titleEn: 'NPC',
             icon: '🎭',
+            image: 'images/npc.png',
             desc: '你没有主角光环，没有极端特质，各项数据都在平均值附近徘徊。你不是独行侠也不是社交花，不是理论派也不是野路子。但正是无数个你，构成了健身房最真实的底色。主角需要观众，而你是最好的观众。',
-            tags: ['平均', '均衡', '真实', '底色']
+            slogan: '平均，但真实',
+            tags: ['平均', '均衡', '真实', '底色'],
+            gymRelations: {
+                partner: 'PAPA（教皇，带你入门）',
+                enemy: '无（你和谁都合得来）',
+                attract: '所有人（你是最好的受众）'
+            },
+            alternatives: ['HUMOR', 'AUDI', 'HOME']
         },
         'JOCK': {
             title: '暗自较劲者',
+            titleEn: 'JOCKER',
             icon: '🏆',
+            image: 'images/jocker.png',
             desc: '你的比较从不宣之于口，只在心中默默进行。赢了，背阔肌自然展开；输了，立刻换组动作找个新手找回场子。你的自尊是隐形的杠铃片，时刻加在心上。',
-            tags: ['隐形较量', '背阔肌雷达', '自尊驱动', '灵活找场子']
+            slogan: '背阔肌是我的晴雨表',
+            tags: ['隐形较量', '背阔肌雷达', '自尊驱动', '灵活找场子'],
+            gymRelations: {
+                partner: 'POWER（力量怪，真正的强者让你心服）',
+                enemy: 'ACTO（影帝，没实力还爱秀）',
+                attract: 'NPCS（群演，让你找回自信）'
+            },
+            alternatives: ['WORR', 'POWER', 'SOLO']
         },
         'PAPA': {
             title: '健身教皇',
+            titleEn: 'PAPA',
             icon: '👑',
+            image: 'images/papa.png',
             desc: '周边人开始健身，第一个想到的就是你。你不是东一句西一句的碎片知识搬运工，你能系统讲解解剖、生理、营养、周期化。经你指导的新手，少走三年弯路。你是行走的健身百科，是新手最好的引路人。',
-            tags: ['系统', '权威', '新手之友', '行走的百科']
+            slogan: '知识就是力量，我就是知识',
+            tags: ['系统', '权威', '新手之友', '行走的百科'],
+            gymRelations: {
+                partner: 'NPCS（群演，最好的学生）',
+                enemy: 'W（野路子，教错误知识还自信）',
+                attract: '所有新手（你是他们的光）'
+            },
+            alternatives: ['OLDD', 'E', 'POWER']
         },
         'DICK': {
             title: '凯格尔爱好者',
+            titleEn: 'DICK',
             icon: '🍆',
+            image: 'images/dick.png',
             desc: '胸？背？腿？那都是表象。你直指核心，直达盆底。凯格尔运动的好处？自己搜。你的训练计划只有一页，但那一页就是全部。别人练的是肌肉，你练的是内功。',
-            tags: ['直指核心', '盆底肌之王', '内功修炼', '自己搜']
+            slogan: '内在强大才是真的强大',
+            tags: ['直指核心', '盆底肌之王', '内功修炼', '自己搜'],
+            gymRelations: {
+                partner: '无（这条路只能一个人走）',
+                enemy: '所有人（没人理解你）',
+                attract: '好奇的新手（然后被你带偏）'
+            },
+            alternatives: ['NAXI', 'W', 'HUMOR']
         },
         'NAXI': {
             title: '动作发明家',
+            titleEn: 'NAXI',
             icon: '🤸',
+            image: 'images/naxi.png',
             desc: '动物流、街健、功能性、杂技——你的训练词典里没有"标准"二字。你批判深蹲太基础，卧推太无聊，你追求的是动作的艺术性。别人练力量，你练的是行为艺术。',
-            tags: ['花哨', '批判', '行为艺术', '反标准']
+            slogan: '标准是给凡人的，我是艺术家',
+            tags: ['花哨', '批判', '行为艺术', '反标准'],
+            gymRelations: {
+                partner: 'HUMOR（胡练者，一起探索）',
+                enemy: 'OLDD（老登，说你花里胡哨）',
+                attract: '新手（看起来很酷）'
+            },
+            alternatives: ['W', 'HUMOR', 'DICK']
         },
         'EATS': {
             title: '糊糊战士',
+            titleEn: 'EAT-SHIT',
             icon: '🥤',
+            image: 'images/eatshit.png',
             desc: '味觉？不存在的。水煮鸡胸、西兰花、燕麦——打成糊糊，一口闷。你不懂什么美食，你懂的是营养素。难吃是勋章，反人性是信仰。你的胃是搅拌机，你的意志是钢铁。',
-            tags: ['糊糊', '反人性', '营养素至上', '无味觉']
+            slogan: '味觉是弱者的借口',
+            tags: ['糊糊', '反人性', '营养素至上', '无味觉'],
+            gymRelations: {
+                partner: 'EATA（饕餮之徒，互补饮食观）',
+                enemy: 'EATA（饕餮之徒，互相不理解）',
+                attract: 'WORR（焦虑者，需要你的饮食控制）'
+            },
+            alternatives: ['EATA', 'WORR', 'FART']
         },
         'EATA': {
             title: '饕餮之徒',
+            titleEn: 'EAT-ALL',
             icon: '🍖',
+            image: 'images/eatall.png',
             desc: '练没练不重要，吃必须吃爽。五花肉？优质动物脂肪！火锅？蛋白质丰富！你的健身哲学是：先吃，其他再说。你的热量盈余不是意外，是战略储备。',
-            tags: ['吃就完了', '热量盈余', '战略储备', '健身先健嘴']
+            slogan: '健身先健嘴，能吃就能练',
+            tags: ['吃就完了', '热量盈余', '战略储备', '健身先健嘴'],
+            gymRelations: {
+                partner: 'EATS（糊糊战士，一起研究吃）',
+                enemy: 'EATS（糊糊战士，互相鄙视）',
+                attract: '所有人（谁不爱吃呢）'
+            },
+            alternatives: ['EATS', 'FART', 'HUMOR']
         },
         'HOME': {
             title: '宅健达人',
+            titleEn: 'HOMER',
             icon: '🏠',
+            image: 'images/homer.png',
             desc: '最好的健身房是最近的健身房——如果那个健身房就是你家的话。你的器械可能不够全，但你的坚持够全。没有社交干扰，没有排队等器械，只有你和铁，纯粹而高效。',
-            tags: ['居家', '纯粹', '无干扰', '最近即最好']
+            slogan: '最近的健身房，就是我家',
+            tags: ['居家', '纯粹', '无干扰', '最近即最好'],
+            gymRelations: {
+                partner: 'SOLO（独行侠，同样不爱社交）',
+                enemy: 'ACTO（影帝，需要健身房观众）',
+                attract: 'AUDI（审计师，没时间出门）'
+            },
+            alternatives: ['SOLO', 'AUDI', 'NPCS']
         },
         'AUDI': {
             title: '审计师',
+            titleEn: 'AUDITOR',
             icon: '📊',
+            image: 'images/auditor.png',
             desc: '你多想哑铃为枕、卧推凳为床！可惜Excel在召唤，PPT在等待，心脑血管在报警。你是健身房的遗憾，是加班文化的牺牲品。你的健身卡是愿望，不是现实。',
-            tags: ['加班', '遗憾', '愿望', '心脑血管警告']
+            slogan: '心有余而力不足',
+            tags: ['加班', '遗憾', '愿望', '心脑血管警告'],
+            gymRelations: {
+                partner: 'HOME（宅健，在家也能练）',
+                enemy: 'G（硬核狠人，时间充裕）',
+                attract: 'PAPA（教皇，高效训练指导）'
+            },
+            alternatives: ['HOME', 'VANI', 'NPCS']
         },
         'LOVE': {
             title: '恋爱脑',
+            titleEn: 'LOVER',
             icon: '💘',
+            image: 'images/lover.png',
             desc: '你来健身房只有一个目的：求偶。雄竞/雌竞是你的核心训练。你的穿搭精心挑选，你的线条刻意展示，你的目光锁定目标。铁是手段，不是目的；充血是为了吸引，不是为了力量。',
-            tags: ['求偶', '雄竞雌竞', '穿搭精心', '目光锁定']
+            slogan: '铁是冷的，心是热的',
+            tags: ['求偶', '雄竞雌竞', '穿搭精心', '目光锁定'],
+            gymRelations: {
+                partner: 'ACTO（影帝，一起拍照营业）',
+                enemy: 'SOLO（独行侠，无视你的存在）',
+                attract: '所有人（只要你够好看）'
+            },
+            alternatives: ['ACTO', 'A', 'JOCK']
         },
         'FART': {
             title: '蛋白质享受者',
+            titleEn: 'FART',
             icon: '💨',
+            image: 'images/fart.png',
             desc: '你不懂碳水循环，不懂脂肪摄入，你只知道：蛋白质，狠狠吃。你的屁是勋章，是代谢旺盛的证明，是氮平衡的凯歌。你放的不仅是气，是信仰。',
-            tags: ['蛋白质', '蛋白屁', '勋章', '氮平衡凯歌']
+            slogan: '屁声一响，黄金万两',
+            tags: ['蛋白质', '蛋白屁', '勋章', '氮平衡凯歌'],
+            gymRelations: {
+                partner: 'EATS（糊糊战士，同样极端饮食）',
+                enemy: 'E（理论派，说你不懂营养）',
+                attract: 'W（野路子，简单粗暴）'
+            },
+            alternatives: ['EATS', 'EATA', 'W']
+        },
+        // 新增2个人格
+        'POWER': {
+            title: '力量怪',
+            titleEn: 'POWERLIFTER',
+            icon: '🦍',
+            image: 'images/powerlifter.png',
+            desc: '你的力量一直很大，从第一次摸杠铃就让老手频频称奇。更可怕的是，你的动作还标准。你是天赋与努力的结合体，是健身房里让人仰望的存在。但你知道，这只是一个开始。',
+            slogan: '力量是我的语言',
+            tags: ['天赋异禀', '力量王者', '动作标准', '让人仰望'],
+            gymRelations: {
+                partner: 'OLDD（老登，唯一理解你的人）',
+                enemy: 'ACTO（影帝，空有其表）',
+                attract: 'WORR（焦虑者，想成为你）'
+            },
+            alternatives: ['OLDD', 'PAPA', 'SOLO']
+        },
+        'HUMOR': {
+            title: '胡练者',
+            titleEn: 'HUMOR',
+            icon: '🎪',
+            image: 'images/humor.png',
+            desc: '你不知道什么是饮食，不知道什么是健身计划，你只是把健身房看成一种室内公园。你在器械间游荡，像逛动物园一样新鲜。你的训练没有逻辑，但你的快乐是真实的。也许有一天你会认真，但今天不是那天。',
+            slogan: '开心就好，其他随缘',
+            tags: ['随缘', '室内公园', '快乐健身', '无计划'],
+            gymRelations: {
+                partner: 'NAXI（动作发明家，一起探索）',
+                enemy: 'PAPA（教皇，看你着急）',
+                attract: '所有人（你让他们感到轻松）'
+            },
+            alternatives: ['NAXI', 'NPCS', 'VANI']
         }
     },
 
-    // NPCS判定逻辑在result.js中处理，这里留空
     hiddenTypes: {}
 };
 
