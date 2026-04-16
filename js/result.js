@@ -10,36 +10,64 @@ function calculateAndShowResult() {
     currentResultType = type;
     const result = getResult(type);
     
-    // 显示中英文名称
-    document.getElementById('resultTitleCN').textContent = result.title;
-    document.getElementById('resultTitleEN').textContent = result.titleEn;
-    document.getElementById('resultIcon').textContent = result.icon;
-    document.getElementById('resultSlogan').textContent = result.slogan || result.desc.substring(0, 50) + '...';
+    // ========== 修复：兼容新旧版本的 DOM 操作 ==========
     
-    // 设置图片（如果有）
+    // 中文名称（新：resultTitleCN，旧：resultTitle）
+    const titleCN = document.getElementById('resultTitleCN') || document.getElementById('resultTitle');
+    if (titleCN) titleCN.textContent = result.title;
+    
+    // 英文名称（新：resultTitleEN）
+    const titleEN = document.getElementById('resultTitleEN');
+    if (titleEN) titleEN.textContent = result.titleEn || type;
+    
+    // 图标（新旧都有）
+    const iconEl = document.getElementById('resultIcon');
+    if (iconEl) iconEl.textContent = result.icon;
+    
+    // 口号/描述（新：resultSlogan，旧：resultDesc）
+    const sloganEl = document.getElementById('resultSlogan') || document.getElementById('resultDesc');
+    if (sloganEl) sloganEl.textContent = result.slogan || result.desc.substring(0, 50) + '...';
+    
+    // 设置图片
     const imgContainer = document.getElementById('resultImage');
-    if (result.image) {
-        imgContainer.innerHTML = `<div class="image-placeholder">${result.icon}</div>`;
-        // 实际图片加载（如果有图片文件）
-        // imgContainer.innerHTML = `<img src="${result.image}" alt="${result.title}" onerror="this.parentElement.innerHTML='<div class='image-placeholder'>${result.icon}</div>'">`;
-    } else {
-        imgContainer.innerHTML = `<div class="image-placeholder">${result.icon}</div>`;
+    if (imgContainer) {
+        if (result.image) {
+            imgContainer.innerHTML = `
+                <img src="${result.image}" 
+                     alt="${result.title}" 
+                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'image-placeholder\'>${result.icon}</div>'"
+                     style="width: 100%; height: 100%; object-fit: cover;"
+                >
+            `;
+        } else {
+            imgContainer.innerHTML = `<div class="image-placeholder">${result.icon}</div>`;
+        }
     }
     
-    // 隐藏人格徽章（如果是特殊触发）
+    // 隐藏人格徽章
     const hiddenBadge = document.getElementById('hiddenBadge');
-    if (type === 'NPCS' && checkExactEqualCondition()) {
-        hiddenBadge.style.display = 'inline-flex';
-        hiddenBadge.innerHTML = '<span class="badge-icon">🔓</span><span>稀有平衡人格已激活</span>';
-    } else {
-        hiddenBadge.style.display = 'none';
+    if (hiddenBadge) {
+        if (type === 'NPCS' && checkExactEqualCondition()) {
+            hiddenBadge.style.display = 'inline-flex';
+            hiddenBadge.innerHTML = '<span class="badge-icon">🔓</span><span>稀有平衡人格已激活</span>';
+        } else {
+            hiddenBadge.style.display = 'none';
+        }
     }
     
-    // 渲染各模块
-    renderDimensionDetails();
-    drawRadarChart();
-    renderGymRelations(result);
-    renderAlternativeTypes(type);
+    // 渲染各模块（添加空值检查）
+    if (document.getElementById('dimensionDetails')) {
+        renderDimensionDetails();
+    }
+    if (document.getElementById('radarCanvas')) {
+        drawRadarChart();
+    }
+    if (document.getElementById('gymRelations')) {
+        renderGymRelations(result);
+    }
+    if (document.getElementById('alternativeTypes')) {
+        renderAlternativeTypes(type);
+    }
     
     showPage('resultPage');
 }
