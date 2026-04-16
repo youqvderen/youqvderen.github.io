@@ -1,81 +1,610 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>健身房人格测试</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <!-- 封面页 -->
-    <div class="page active" id="coverPage">
-        <div class="hero">
-            <div class="hero-icon">💪</div>
-            <h1>健身房人格测试</h1>
-            <p class="subtitle">测测你是哪种健身狠人？<br>影帝、老登、还是凯格尔爱好者...</p>
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number" id="qCount">16</div>
-                    <div class="stat-label">灵魂拷问</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">4</div>
-                    <div class="stat-label">维度分析</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="typeCount">16</div>
-                    <div class="stat-label">健身人格</div>
-                </div>
-            </div>
-            <button class="btn" onclick="startQuiz()">开始测试</button>
-            <p style="margin-top: 16px; font-size: 0.875rem; color: var(--text-light);">预计用时 3-4 分钟 · 无器械要求</p>
-        </div>
-    </div>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    <!-- 测试页 -->
-    <div class="page" id="quizPage">
-        <div class="quiz-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressBar"></div>
-            </div>
-            <div class="question-header">
-                <span class="question-number" id="questionNumber">问题 1 / 16</span>
-                <span style="color: var(--text-light); font-size: 0.875rem;">按 A/B/C/D 键快速选择</span>
-            </div>
-            <h2 class="question-text" id="questionText">加载中...</h2>
-            <div class="options" id="optionsContainer"></div>
-            <div class="nav-buttons">
-                <button class="btn-secondary" id="prevBtn" onclick="prevQuestion()" disabled>上一题</button>
-                <button class="btn-secondary" onclick="restartQuiz()">重新开始</button>
-            </div>
-        </div>
-    </div>
+:root {
+    --primary: #e17055;
+    --primary-dark: #d63031;
+    --secondary: #fdcb6e;
+    --bg: #fff9f0;
+    --card: #ffffff;
+    --text: #2d3436;
+    --text-light: #636e72;
+    --border: #ffeaa7;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+    --success: #00b894;
+    --warning: #fdcb6e;
+    --danger: #d63031;
+}
 
-    <!-- 结果页 -->
-    <div class="page" id="resultPage">
-        <div class="result-container">
-            <div class="result-card">
-                <div class="result-type" id="resultType">健身人格</div>
-                <h1 class="result-title" id="resultTitle">加载中...</h1>
-                <div class="result-icon" id="resultIcon">💪</div>
-                <p class="result-desc" id="resultDesc">分析中...</p>
-                <div class="radar-container">
-                    <canvas id="radarCanvas" width="300" height="300"></canvas>
-                </div>
-                <div class="dimension-scores" id="dimensionScores"></div>
-            </div>
-            <div class="share-section">
-                <p class="share-text">分享你的健身人格 · 寻找同类</p>
-                <div class="share-buttons">
-                    <button class="share-btn" onclick="copyResult()">📋 复制结果</button>
-                    <button class="share-btn" onclick="restartQuiz()">🔄 再测一次</button>
-                </div>
-            </div>
-        </div>
-    </div>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
 
-    <script src="js/data.js"></script>
-    <script src="js/quiz.js"></script>
-    <script src="js/result.js"></script>
-</body>
-</html>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.page {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+}
+
+.page.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 封面页 */
+.hero {
+    text-align: center;
+    max-width: 600px;
+}
+
+.hero-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: float 3s ease infinite;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero .subtitle {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 32px;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 32px 0;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.btn {
+    display: inline-block;
+    padding: 16px 48px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+    background: var(--primary);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 测试页 */
+.quiz-container {
+    width: 100%;
+    max-width: 700px;
+    background: var(--card);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: var(--shadow-lg);
+}
+
+.progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    margin-bottom: 40px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width 0.3s ease;
+    border-radius: 3px;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.question-number {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.question-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 32px;
+    line-height: 1.4;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.option:hover {
+    border-color: var(--primary);
+    background: rgba(225, 112, 85, 0.05);
+    transform: translateX(4px);
+}
+
+.option-key {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 16px;
+    transition: all 0.2s;
+}
+
+.option:hover .option-key {
+    background: var(--primary);
+    color: white;
+}
+
+.option-text {
+    flex: 1;
+    font-size: 1rem;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+}
+
+.btn-secondary {
+    padding: 12px 24px;
+    background: transparent;
+    color: var(--text-light);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    border-color: var(--text-light);
+    color: var(--text);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* 结果页 - 全新设计 */
+.result-container {
+    width: 100%;
+    max-width: 680px;
+    padding: 20px;
+}
+
+.result-card {
+    background: var(--card);
+    border-radius: 32px;
+    padding: 48px 32px;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.result-label {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+}
+
+.result-title-cn {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.result-title-en {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 4px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+}
+
+.result-image {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 24px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    font-size: 80px;
+    animation: pulse 2s ease infinite;
+}
+
+.result-slogan {
+    font-size: 1.125rem;
+    color: var(--text-light);
+    font-style: italic;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* 隐藏人格徽章 */
+.hidden-badge {
+    background: linear-gradient(135deg, var(--warning), var(--secondary));
+    color: var(--text);
+    padding: 12px 24px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+}
+
+.badge-icon {
+    font-size: 1.25rem;
+}
+
+/* 详情区块 */
+.detail-section {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 雷达图 */
+.radar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+#radarCanvas {
+    max-width: 100%;
+}
+
+.radar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    font-size: 0.875rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+/* 维度详解 */
+.dimension-details {
+    display: grid;
+    gap: 16px;
+}
+
+.dimension-detail-item {
+    background: var(--bg);
+    padding: 20px;
+    border-radius: 16px;
+    border-left: 4px solid var(--primary);
+}
+
+.dimension-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.dimension-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.dimension-percent {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.dimension-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.dimension-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.dimension-desc {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+/* 健身房关系 */
+.gym-relations {
+    display: grid;
+    gap: 16px;
+}
+
+.relation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg);
+    border-radius: 12px;
+}
+
+.relation-label {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.relation-value {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* 最佳备选 */
+.alternative-types {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alt-type-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.alt-type-item:hover {
+    background: rgba(225, 112, 85, 0.1);
+    transform: translateX(4px);
+}
+
+.alt-type-icon {
+    font-size: 2rem;
+}
+
+.alt-type-info {
+    flex: 1;
+}
+
+.alt-type-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.alt-type-match {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.alt-type-similarity {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* 分享区域 */
+.share-section {
+    text-align: center;
+    margin-top: 32px;
+}
+
+.share-text {
+    color: var(--text-light);
+    margin-bottom: 16px;
+}
+
+.share-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    padding: 14px 28px;
+    border-radius: 50px;
+    border: 2px solid var(--border);
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.share-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.share-btn.primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.share-btn.primary:hover {
+    background: var(--primary-dark);
+}
+
+/* 分享图预览 */
+.share-preview {
+    margin-top: 24px;
+    text-align: center;
+    padding: 20px;
+    background: var(--card);
+    border-radius: 16px;
+}
+
+#shareCanvas {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+    .hero h1 {
+        font-size: 1.875rem;
+    }
+    
+    .quiz-container {
+        padding: 24px;
+    }
+    
+    .question-text {
+        font-size: 1.25rem;
+    }
+    
+    .result-title-cn {
+        font-size: 2rem;
+    }
+    
+    .result-title-en {
+        font-size: 1.25rem;
+    }
+    
+    .detail-section {
+        padding: 24px;
+    }
+}
