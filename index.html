@@ -12,10 +12,10 @@
         <div class="hero">
             <div class="hero-icon">💪</div>
             <h1>健身房人格测试</h1>
-            <p class="subtitle">测测你是哪种健身狠人？<br>影帝、老登、还是凯格尔爱好者...</p>
+            <p class="subtitle">测测你是哪种健身狠人？<br>18种人格等你解锁</p>
             <div class="stats">
                 <div class="stat-item">
-                    <div class="stat-number" id="qCount">16</div>
+                    <div class="stat-number" id="qCount">20</div>
                     <div class="stat-label">灵魂拷问</div>
                 </div>
                 <div class="stat-item">
@@ -23,12 +23,12 @@
                     <div class="stat-label">维度分析</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number" id="typeCount">16</div>
+                    <div class="stat-number" id="typeCount">18</div>
                     <div class="stat-label">健身人格</div>
                 </div>
             </div>
             <button class="btn" onclick="startQuiz()">开始测试</button>
-            <p style="margin-top: 16px; font-size: 0.875rem; color: var(--text-light);">预计用时 3-4 分钟 · 无器械要求</p>
+            <p style="margin-top: 16px; font-size: 0.875rem; color: var(--text-light);">预计用时 4-5 分钟 · 无器械要求</p>
         </div>
     </div>
 
@@ -39,7 +39,7 @@
                 <div class="progress-fill" id="progressBar"></div>
             </div>
             <div class="question-header">
-                <span class="question-number" id="questionNumber">问题 1 / 16</span>
+                <span class="question-number" id="questionNumber">问题 1 / 20</span>
                 <span style="color: var(--text-light); font-size: 0.875rem;">按 A/B/C/D 键快速选择</span>
             </div>
             <h2 class="question-text" id="questionText">加载中...</h2>
@@ -54,26 +54,82 @@
     <!-- 结果页 -->
     <div class="page" id="resultPage">
         <div class="result-container">
-            <div class="result-card">
-                <div class="result-type" id="resultType">健身人格</div>
-                <h1 class="result-title" id="resultTitle">加载中...</h1>
-                <div class="result-icon" id="resultIcon">💪</div>
-                <p class="result-desc" id="resultDesc">分析中...</p>
-                <div class="radar-container">
-                    <canvas id="radarCanvas" width="300" height="300"></canvas>
+            <!-- 主结果卡片 -->
+            <div class="result-card main-result">
+                <div class="result-label">你的人格类型是</div>
+                <h1 class="result-title-cn" id="resultTitleCN">加载中...</h1>
+                <div class="result-title-en" id="resultTitleEN">LOADING</div>
+                <div class="result-image" id="resultImage">
+                    <div class="image-placeholder">🎭</div>
                 </div>
-                <div class="dimension-scores" id="dimensionScores"></div>
+                <p class="result-slogan" id="resultSlogan">分析中...</p>
             </div>
+
+            <!-- 隐藏人格提示（如果有） -->
+            <div class="hidden-badge" id="hiddenBadge" style="display: none;">
+                <span class="badge-icon">🔓</span>
+                <span>隐藏人格已激活</span>
+            </div>
+
+            <!-- 维度详解 -->
+            <div class="detail-section">
+                <h3 class="section-title">📊 四维能力蛛网图</h3>
+                <div class="radar-wrapper">
+                    <canvas id="radarCanvas" width="320" height="320"></canvas>
+                    <div class="radar-legend" id="radarLegend"></div>
+                </div>
+            </div>
+
+            <!-- 维度详解 -->
+            <div class="detail-section">
+                <h3 class="section-title">📈 维度详解</h3>
+                <div class="dimension-details" id="dimensionDetails"></div>
+            </div>
+
+            <!-- 健身房关系 -->
+            <div class="detail-section">
+                <h3 class="section-title">🏋️ 健身房生态位</h3>
+                <div class="gym-relations" id="gymRelations">
+                    <div class="relation-item">
+                        <span class="relation-label">最佳搭档</span>
+                        <span class="relation-value" id="bestPartner">-</span>
+                    </div>
+                    <div class="relation-item">
+                        <span class="relation-label">天敌/克星</span>
+                        <span class="relation-value" id="worstEnemy">-</span>
+                    </div>
+                    <div class="relation-item">
+                        <span class="relation-label">吸引对象</span>
+                        <span class="relation-value" id="attractTo">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最佳备选 -->
+            <div class="detail-section">
+                <h3 class="section-title">🎯 最佳备选人格</h3>
+                <div class="alternative-types" id="alternativeTypes"></div>
+            </div>
+
+            <!-- 分享区域 -->
             <div class="share-section">
                 <p class="share-text">分享你的健身人格 · 寻找同类</p>
                 <div class="share-buttons">
+                    <button class="share-btn primary" onclick="generateShareImage()">📸 生成分享图</button>
                     <button class="share-btn" onclick="copyResult()">📋 复制结果</button>
                     <button class="share-btn" onclick="restartQuiz()">🔄 再测一次</button>
                 </div>
             </div>
+
+            <!-- 分享图预览（生成后显示） -->
+            <div class="share-preview" id="sharePreview" style="display: none;">
+                <canvas id="shareCanvas" width="600" height="800"></canvas>
+                <p style="margin-top: 12px; color: var(--text-light);">长按保存图片</p>
+            </div>
         </div>
     </div>
 
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="js/data.js"></script>
     <script src="js/quiz.js"></script>
     <script src="js/result.js"></script>
