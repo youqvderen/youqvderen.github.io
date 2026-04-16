@@ -3,7 +3,13 @@ let answers = [];
 let scores = {};
 
 function initScores() {
-    scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+    // 8个维度：S/O, G/C, A/I, E/W
+    scores = { 
+        S: 0, O: 0, 
+        G: 0, C: 0, 
+        A: 0, I: 0, 
+        E: 0, W: 0 
+    };
 }
 
 function startQuiz() {
@@ -11,6 +17,7 @@ function startQuiz() {
     answers = [];
     initScores();
     
+    // 更新封面统计
     document.getElementById('qCount').textContent = quizConfig.questions.length;
     document.getElementById('typeCount').textContent = Object.keys(quizConfig.results).length;
     
@@ -48,14 +55,17 @@ function selectOption(idx) {
     const q = quizConfig.questions[currentQuestion];
     const optionScores = q.options[idx].scores;
     
+    // 记录答案
     answers[currentQuestion] = idx;
     
+    // 累加维度分数
     for (let dim in optionScores) {
         if (scores.hasOwnProperty(dim)) {
             scores[dim] += optionScores[dim];
         }
     }
     
+    // 进入下一题或显示结果
     if (currentQuestion < quizConfig.questions.length - 1) {
         currentQuestion++;
         renderQuestion();
@@ -66,14 +76,18 @@ function selectOption(idx) {
 
 function prevQuestion() {
     if (currentQuestion > 0) {
+        // 扣除当前题的分数
         const q = quizConfig.questions[currentQuestion];
         const prevAnswer = answers[currentQuestion];
         if (prevAnswer !== undefined) {
             const optionScores = q.options[prevAnswer].scores;
             for (let dim in optionScores) {
-                if (scores.hasOwnProperty(dim)) scores[dim] -= optionScores[dim];
+                if (scores.hasOwnProperty(dim)) {
+                    scores[dim] -= optionScores[dim];
+                }
             }
         }
+        
         currentQuestion--;
         renderQuestion();
     }
@@ -83,6 +97,7 @@ function restartQuiz() {
     startQuiz();
 }
 
+// 键盘快捷键支持
 document.addEventListener('keydown', (e) => {
     if (!document.getElementById('quizPage').classList.contains('active')) return;
     
@@ -90,7 +105,9 @@ document.addEventListener('keydown', (e) => {
     if (['A', 'B', 'C', 'D'].includes(key)) {
         const idx = key.charCodeAt(0) - 65;
         const options = document.querySelectorAll('.option');
-        if (options[idx]) options[idx].click();
+        if (options[idx]) {
+            options[idx].click();
+        }
     } else if (e.key === 'ArrowLeft' && currentQuestion > 0) {
         prevQuestion();
     }
