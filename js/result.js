@@ -39,7 +39,7 @@ function calculateResult() {
         return 'DICK';
     }
     
-    // ACTO 影帝：表现型极高且拍照相关答案
+    // ACTO 影弟：表现型极高且拍照相关答案
     if (scores.A > 10 && (answers[2] === 1 || answers[13] === 3)) {
         return 'ACTO';
     }
