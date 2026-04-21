@@ -10,38 +10,59 @@ function calculateAndShowResult() {
     currentResultType = type;
     const result = getResult(type);
     
-    // ========== 修复：兼容新旧版本的 DOM 操作 ==========
+    // ========== 加载人格图片 ==========
+    const imgEl = document.getElementById('resultImage');
+    const fallbackEl = document.getElementById('imageFallback');
+    const fallbackIcon = document.getElementById('fallbackIcon');
     
-    // 中文名称（新：resultTitleCN，旧：resultTitle）
-    const titleCN = document.getElementById('resultTitleCN') || document.getElementById('resultTitle');
+    if (result.image) {
+        imgEl.src = result.image;
+        imgEl.style.display = 'block';
+        fallbackEl.style.display = 'none';
+        
+        // 调试：检查图片加载
+        imgEl.onload = function() {
+            console.log('图片加载成功:', result.image);
+        };
+        imgEl.onerror = function() {
+            console.log('图片加载失败:', result.image);
+            console.log('尝试路径:', window.location.origin + '/' + result.image);
+            imgEl.style.display = 'none';
+            fallbackEl.style.display = 'flex';
+            fallbackIcon.textContent = result.icon || '💪';
+        };
+    } else {
+        imgEl.style.display = 'none';
+        fallbackEl.style.display = 'flex';
+        fallbackIcon.textContent = result.icon || '💪';
+    }
+    
+    // ========== 醒目标注人格代码和名称 ==========
+    
+    // 字母代码（大写醒目）
+    const codeEl = document.getElementById('resultCode');
+    if (codeEl) codeEl.textContent = type;
+    
+    // 中文名称
+    const titleCN = document.getElementById('resultTitleCN');
     if (titleCN) titleCN.textContent = result.title;
     
-    // 英文名称（新：resultTitleEN）
+    // 英文名称
     const titleEN = document.getElementById('resultTitleEN');
     if (titleEN) titleEN.textContent = result.titleEn || type;
     
-    // 图标（新旧都有）
-    const iconEl = document.getElementById('resultIcon');
-    if (iconEl) iconEl.textContent = result.icon;
+    // 口号
+    const sloganEl = document.getElementById('resultSlogan');
+    if (sloganEl) sloganEl.textContent = result.slogan || '';
     
-    // 口号/描述（新：resultSlogan，旧：resultDesc）
-    const sloganEl = document.getElementById('resultSlogan') || document.getElementById('resultDesc');
-    if (sloganEl) sloganEl.textContent = result.slogan || result.desc.substring(0, 50) + '...';
+    // 详细描述
+    const descEl = document.getElementById('resultDesc');
+    if (descEl) descEl.textContent = result.desc;
     
-    // 设置图片
-    const imgContainer = document.getElementById('resultImage');
-    if (imgContainer) {
-        if (result.image) {
-            imgContainer.innerHTML = `
-                <img src="${result.image}" 
-                     alt="${result.title}" 
-                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'image-placeholder\'>${result.icon}</div>'"
-                     style="width: 100%; height: 100%; object-fit: cover;"
-                >
-            `;
-        } else {
-            imgContainer.innerHTML = `<div class="image-placeholder">${result.icon}</div>`;
-        }
+    // 标签
+    const tagsEl = document.getElementById('resultTags');
+    if (tagsEl && result.tags) {
+        tagsEl.innerHTML = result.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
     }
     
     // 隐藏人格徽章
@@ -49,13 +70,12 @@ function calculateAndShowResult() {
     if (hiddenBadge) {
         if (type === 'NPCS' && checkExactEqualCondition()) {
             hiddenBadge.style.display = 'inline-flex';
-            hiddenBadge.innerHTML = '<span class="badge-icon">🔓</span><span>稀有平衡人格已激活</span>';
         } else {
             hiddenBadge.style.display = 'none';
         }
     }
     
-    // 渲染各模块（添加空值检查）
+    // 渲染各模块
     if (document.getElementById('dimensionDetails')) {
         renderDimensionDetails();
     }
@@ -81,24 +101,24 @@ function calculateResult() {
         E: scores.E >= scores.W ? 'E' : 'W'
     };
     
-    // 检查NPCS条件（严格版：至少3个维度得分完全相等，且不含高训练水平人格）
+    // 检查NPCS条件（严格版）
     const isNPCS = checkStrictNPCSCondition(dimScores);
     if (isNPCS) return 'NPCS';
     
-    // 计算训练水平分数（用于POWER判定）
+    // 计算训练水平分数
     const trainingLevel = calculateTrainingLevel();
     
-    // POWER 力量怪：高训练水平 + 高G + 高E
+    // POWER 力量怪
     if (trainingLevel >= 3 && scores.G > 12 && scores.E > 10 && scores.S > scores.O) {
         return 'POWER';
     }
     
-    // HUMOR 胡练者：低训练水平 + 高C + 高W
+    // HUMOR 胡练者
     if (trainingLevel <= 2 && scores.C > 10 && scores.W > 8 && scores.G < 6) {
         return 'HUMOR';
     }
     
-    // 其他原有判定...
+    // 其他原有判定
     if (scores.S < 5 && scores.O < 5 && scores.G < 5 && scores.C > 8) return 'VANI';
     if (scores.W > 12 && answers[9] === 1) return 'DICK';
     if (scores.A > 10 && (answers[2] === 1 || answers[13] === 3)) return 'ACTO';
@@ -119,7 +139,6 @@ function calculateResult() {
 }
 
 function calculateTrainingLevel() {
-    // 基于最后4道训练水平题计算
     let level = 0;
     for (let i = 16; i < 20; i++) {
         if (answers[i] !== undefined) {
@@ -134,7 +153,6 @@ function calculateTrainingLevel() {
 }
 
 function checkStrictNPCSCondition(dimScores) {
-    // 严格条件：至少3个维度得分完全相等（差距为0）
     const pairs = [
         ['S', 'O'],
         ['G', 'C'],
@@ -143,19 +161,15 @@ function checkStrictNPCSCondition(dimScores) {
     ];
     
     let equalCount = 0;
-    const equalDims = [];
     
     pairs.forEach(([a, b]) => {
         if (scores[a] === scores[b] && scores[a] > 0) {
             equalCount++;
-            equalDims.push(a + '/' + b);
         }
     });
     
-    // 至少3个维度完全相等
     if (equalCount < 3) return false;
     
-    // 检查是否包含高训练水平人格特征
     const highTrainIndicators = scores.G > 10 || scores.E > 10 || scores.S > 10;
     if (highTrainIndicators) return false;
     
@@ -180,9 +194,9 @@ function generateGenericResult(type) {
         title: '神秘人格',
         titleEn: type,
         icon: '❓',
-        desc: '你的健身人格超越了现有分类。',
+        desc: '你的健身人格超越了现有分类，是一种独特的存在。',
         slogan: '独一无二的存在',
-        tags: ['独特'],
+        tags: ['独特', '融合', '超越分类'],
         gymRelations: { partner: '-', enemy: '-', attract: '-' },
         alternatives: ['NPCS', 'HUMOR', 'SOLO']
     };
@@ -201,7 +215,6 @@ function renderDimensionDetails() {
     pairs.forEach(({ dims: [a, b], names: [aName, bName], desc }) => {
         const total = scores[a] + scores[b];
         const aPercent = total > 0 ? Math.round((scores[a] / total) * 100) : 50;
-        const bPercent = 100 - aPercent;
         const dominant = scores[a] >= scores[b] ? a : b;
         const dominantName = scores[a] >= scores[b] ? aName : bName;
         const dim = quizConfig.dimensions[dominant];
@@ -210,10 +223,12 @@ function renderDimensionDetails() {
             <div class="dimension-detail-item" style="border-left-color: ${dim.color}">
                 <div class="dimension-detail-header">
                     <span class="dimension-name">${aName} vs ${bName}</span>
-                    <span class="dimension-percent" style="color: ${dim.color}">${dominantName} ${scores[a] >= scores[b] ? aPercent : bPercent}%</span>
+                    <span class="dimension-percent" style="color: ${dim.color}">
+                        ${dominantName} ${scores[a] >= scores[b] ? aPercent : 100 - aPercent}%
+                    </span>
                 </div>
                 <div class="dimension-bar">
-                    <div class="dimension-bar-fill" style="width: ${scores[a] >= scores[b] ? aPercent : bPercent}%; background: ${dim.color}"></div>
+                    <div class="dimension-bar-fill" style="width: ${scores[a] >= scores[b] ? aPercent : 100 - aPercent}%; background: ${dim.color}"></div>
                 </div>
                 <div class="dimension-desc">${desc}</div>
             </div>
@@ -264,7 +279,6 @@ function drawRadarChart() {
         ctx.lineTo(x, y);
         ctx.stroke();
         
-        // 标签
         const labelX = centerX + Math.cos(angle) * (radius + 25);
         const labelY = centerY + Math.sin(angle) * (radius + 25);
         ctx.fillStyle = quizConfig.dimensions[dim]?.color || '#666';
@@ -274,7 +288,7 @@ function drawRadarChart() {
         ctx.fillText(labels[i], labelX, labelY);
     });
     
-    // 计算数据点（归一化）
+    // 计算数据点
     const maxScore = 20;
     const dataPoints = dims.map(dim => Math.min(scores[dim] / maxScore, 1));
     
@@ -332,11 +346,10 @@ function renderAlternativeTypes(currentType) {
     
     let html = '';
     
-    alternatives.forEach((altType, index) => {
+    alternatives.forEach((altType) => {
         const alt = quizConfig.results[altType];
         if (!alt) return;
         
-        // 计算相似度（基于维度得分差异）
         const similarity = calculateSimilarity(currentType, altType);
         
         html += `
@@ -355,12 +368,10 @@ function renderAlternativeTypes(currentType) {
 }
 
 function calculateSimilarity(typeA, typeB) {
-    // 简化的相似度计算
-    return Math.floor(70 + Math.random() * 25); // 实际应该基于维度得分计算
+    return Math.floor(70 + Math.random() * 25);
 }
 
 function showAlternativeDetail(type) {
-    // 可以扩展为显示备选人格的详细信息
     alert('查看 ' + quizConfig.results[type].title + ' 的详细信息');
 }
 
@@ -418,8 +429,6 @@ function generateShareImage() {
     
     // 显示预览
     preview.style.display = 'block';
-    
-    // 滚动到预览区域
     preview.scrollIntoView({ behavior: 'smooth' });
 }
 
