@@ -54,21 +54,41 @@
     <!-- 结果页 -->
     <div class="page" id="resultPage">
         <div class="result-container">
-            <!-- 主结果卡片 -->
-            <div class="result-card main-result">
-                <div class="result-label">你的人格类型是</div>
-                <h1 class="result-title-cn" id="resultTitleCN">加载中...</h1>
-                <div class="result-title-en" id="resultTitleEN">LOADING</div>
-                <div class="result-image" id="resultImage">
-                    <div class="image-placeholder">🎭</div>
+            
+            <!-- 主结果卡片 - 图片+名称区域 -->
+            <div class="result-hero">
+                <!-- 人格图片 -->
+                <div class="result-image-wrapper">
+                    <img id="resultImage" src="" alt="人格图片" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="image-fallback" id="imageFallback" style="display: none;">
+                        <span id="fallbackIcon">💪</span>
+                    </div>
                 </div>
-                <p class="result-slogan" id="resultSlogan">分析中...</p>
+                
+                <!-- 醒目标注区域 -->
+                <div class="result-badge">
+                    <div class="result-code" id="resultCode">SOLO</div>
+                    <div class="result-names">
+                        <span class="result-name-cn" id="resultTitleCN">独行侠</span>
+                        <span class="result-divider">·</span>
+                        <span class="result-name-en" id="resultTitleEN">HERMIT</span>
+                    </div>
+                </div>
+                
+                <!-- 口号 -->
+                <p class="result-slogan" id="resultSlogan">孤独是强者的通行证</p>
             </div>
 
-            <!-- 隐藏人格提示（如果有） -->
+            <!-- 隐藏人格徽章（如果有） -->
             <div class="hidden-badge" id="hiddenBadge" style="display: none;">
                 <span class="badge-icon">🔓</span>
-                <span>隐藏人格已激活</span>
+                <span>稀有平衡人格已激活</span>
+            </div>
+
+            <!-- 描述卡片 -->
+            <div class="result-desc-card">
+                <p id="resultDesc">你是健身房的幽灵...</p>
+                <div class="result-tags" id="resultTags"></div>
             </div>
 
             <!-- 维度详解 -->
@@ -129,7 +149,6 @@
         </div>
     </div>
 
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="js/data.js"></script>
     <script src="js/quiz.js"></script>
     <script src="js/result.js"></script>
