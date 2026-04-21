@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>人格图片测试</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 16px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card img { width: 150px; height: 150px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+        .card h3 { margin: 0; font-size: 1.1rem; }
+        .card p { margin: 4px 0; color: #666; font-size: 0.875rem; }
+        .error { color: red; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <h1>健身房人格 - 图片测试</h1>
+    <div class="grid" id="grid"></div>
+    
+    <script>
+        const baseUrl = 'https://youqvderen.github.io/';
+        
+        const personalities = [
+            { code: 'SOLO', name: '独行侠', file: 'images/solo.png' },
+            { code: 'ACTO', name: '影帝', file: 'images/acto.png' },
+            { code: 'WORR', name: '焦虑者', file: 'images/worr.png' },
+            { code: 'OLDD', name: '老登', file: 'images/oldd.png' },
+            { code: 'VANI', name: '消失者', file: 'images/vani.png' },
+            { code: 'NPCS', name: '群演', file: 'images/npcs.png' },
+            { code: 'JOCK', name: '暗自较劲者', file: 'images/jock.png' },
+            { code: 'PAPA', name: '健身教皇', file: 'images/papa.png' },
+            { code: 'DICK', name: '凯格尔爱好者', file: 'images/dick.png' },
+            { code: 'NAXI', name: '动作发明家', file: 'images/naxi.png' },
+            { code: 'EATS', name: '糊糊战士', file: 'images/eats.png' },
+            { code: 'EATA', name: '饕餮之徒', file: 'images/eata.png' },
+            { code: 'HOME', name: '宅健达人', file: 'images/home.png' },
+            { code: 'AUDI', name: '审计师', file: 'images/audi.png' },
+            { code: 'LOVE', name: '恋爱脑', file: 'images/love.png' },
+            { code: 'FART', name: '蛋白质享受者', file: 'images/fart.png' },
+            { code: 'POWER', name: '力量怪', file: 'images/power.png' },
+            { code: 'HUMOR', name: '胡练者', file: 'images/humor.png' }
+        ];
+        
+        const grid = document.getElementById('grid');
+        
+        personalities.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const img = new Image();
+            img.src = baseUrl + p.file;
+            img.onload = () => {
+                card.innerHTML = `
+                    <img src="${baseUrl + p.file}" alt="${p.name}">
+                    <h3>${p.code}</h3>
+                    <p>${p.name}</p>
+                    <p style="color: green;">✅ 加载成功</p>
+                `;
+            };
+            img.onerror = () => {
+                card.innerHTML = `
+                    <div style="width:150px;height:150px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;border-radius:12px;">
+                        <span style="font-size:48px;">❓</span>
+                    </div>
+                    <h3>${p.code}</h3>
+                    <p>${p.name}</p>
+                    <p class="error">❌ 加载失败<br>${p.file}</p>
+                `;
+            };
+            
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
